@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(npx expo start:*)",
+      "mcp__Control_your_Mac__osascript",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(head -50 /Users/jachsonserra/Desktop/Jachson/mindos/app/\\\\\\(tabs\\\\\\)/_layout.tsx)",
+      "Bash(node --version)",
+      "Bash(npm --version)",
+      "Bash(export PATH=\"/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:$PATH\")",
+      "Bash(export PATH=\"$HOME/.nvm/versions/node/v20.20.0/bin:$PATH\")",
+      "Bash(npx create-expo-app focusguard --template bare-minimum)",
+      "Bash(npx create-expo-app focusguard --template bare-minimum --yes)",
+      "Bash(npm install zustand @react-native-async-storage/async-storage @react-navigation/native @react-navigation/stack react-native-safe-area-context react-native-screens)",
+      "Bash(npm install @react-navigation/native-stack typescript @types/react @types/react-native)",
+      "Bash(echo \"Exit code: $?\")"
+    ]
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "MindOS",
+    "slug": "arres",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "arres",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.jachson.arres",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSUserNotificationUsageDescription": "O MindOS usa notificações para lembretes de rotinas, proteção de streaks e alertas de momentum.",
+        "NSPhotoLibraryUsageDescription": "Use suas fotos para o Mural de Objetivos.",
+        "NSPhotoLibraryAddUsageDescription": "Salve imagens do app na sua biblioteca.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.jachson.arres",
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png",
+      "name": "MindOS",
+      "shortName": "MindOS",
+      "lang": "pt-BR"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "65a23957-8d1e-4e4b-a98e-a530f4cd6c20"
+      },
+      "router": {}
+    },
+    "owner": "jachson",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/65a23957-8d1e-4e4b-a98e-a530f4cd6c20"
+    }
+  }
+}
