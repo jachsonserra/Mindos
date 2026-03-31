@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
   TextInput, KeyboardAvoidingView, Platform, ActivityIndicator,
@@ -61,21 +62,18 @@ function MessageBubble({ item }: { item: CoachChatMessage }) {
 
 // ─── Sugestões rápidas ────────────────────────────────────────────────────────
 
-const QUICK_PROMPTS = [
-  'Como estou me saindo?',
-  'O que devo focar hoje?',
-  'Estou travado. Me ajuda.',
-  'Analisa minha semana.',
-];
+// Quick prompts are i18n-aware — rendered inside the component
 
 function QuickPrompts({ onSelect }: { onSelect: (text: string) => void }) {
+  const { t } = useTranslation();
+  const prompts: string[] = t('coach.quickPrompts', { returnObjects: true }) as string[];
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={qp.wrap}
     >
-      {QUICK_PROMPTS.map(p => (
+      {prompts.map(p => (
         <TouchableOpacity key={p} style={qp.chip} onPress={() => onSelect(p)}>
           <Text style={qp.chipText}>{p}</Text>
         </TouchableOpacity>
@@ -87,17 +85,12 @@ function QuickPrompts({ onSelect }: { onSelect: (text: string) => void }) {
 // ─── Banner de chave ausente ──────────────────────────────────────────────────
 
 function NoKeyBanner() {
+  const { t } = useTranslation();
   return (
     <View style={s.noKeyBanner}>
       <Text style={s.noKeyEmoji}>🔑</Text>
-      <Text style={s.noKeyTitle}>Configure sua chave da Anthropic</Text>
-      <Text style={s.noKeyText}>
-        Adicione{' '}
-        <Text style={s.noKeyCode}>EXPO_PUBLIC_ANTHROPIC_KEY=sk-ant-...</Text>
-        {' '}no arquivo <Text style={s.noKeyCode}>.env.local</Text> do projeto
-        e reinicie o app.{'\n\n'}
-        Obtenha em: console.anthropic.com/settings/keys
-      </Text>
+      <Text style={s.noKeyTitle}>{t('coach.noKey.title')}</Text>
+      <Text style={s.noKeyText}>{t('coach.noKey.text')}</Text>
     </View>
   );
 }
@@ -105,6 +98,7 @@ function NoKeyBanner() {
 // ─── Tela Principal ───────────────────────────────────────────────────────────
 
 export default function CoachScreen() {
+  const { t }              = useTranslation();
   const scrollRef = useRef<ScrollView>(null);
   const [input, setInput]     = useState('');
   const [hasKey, setHasKey]   = useState(true);
@@ -164,7 +158,7 @@ export default function CoachScreen() {
   if (!hasKey) return (
     <SafeAreaView style={s.screen} edges={['top']}>
       <View style={s.header}>
-        <Text style={s.title}>Coach</Text>
+        <Text style={s.title}>{t('coach.title')}</Text>
         <Text style={s.titleEmoji}>🧠</Text>
       </View>
       <NoKeyBanner />
@@ -176,9 +170,9 @@ export default function CoachScreen() {
       {/* Header */}
       <View style={s.header}>
         <View style={{ flex: 1 }}>
-          <Text style={s.title}>Coach</Text>
+          <Text style={s.title}>{t('coach.title')}</Text>
           <Text style={s.subtitle}>
-            {user?.name ? `Contexto carregado para ${user.name}` : 'Seu coach pessoal'}
+            {user?.name ? t('coach.contextLoaded', { name: user.name }) : t('coach.personalCoach')}
           </Text>
         </View>
         <TouchableOpacity onPress={clearHistory} style={s.clearBtn}>
@@ -202,7 +196,7 @@ export default function CoachScreen() {
           {messages.length === 0 && (
             <View style={s.emptyState}>
               <Text style={s.emptyEmoji}>🧠</Text>
-              <Text style={s.emptyTitle}>Iniciando contexto...</Text>
+              <Text style={s.emptyTitle}>{t('coach.loadingContext')}</Text>
               <ActivityIndicator color={COLORS.primary} style={{ marginTop: 8 }} />
             </View>
           )}
@@ -223,7 +217,7 @@ export default function CoachScreen() {
             style={s.input}
             value={input}
             onChangeText={setInput}
-            placeholder="Escreva para o seu coach..."
+            placeholder={t('coach.inputPlaceholder')}
             placeholderTextColor={COLORS.textMuted}
             multiline
             maxLength={1000}

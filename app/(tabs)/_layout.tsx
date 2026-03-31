@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import {
@@ -19,6 +20,7 @@ import { NotificationService } from '../../src/services/notifications/notificati
 const DESKTOP_BREAKPOINT = 768;
 
 export default function TabLayout() {
+  const { t }                   = useTranslation();
   const router                  = useRouter();
   const { width }               = useWindowDimensions();
   const isDesktop               = Platform.OS === 'web' && width >= DESKTOP_BREAKPOINT;
@@ -66,11 +68,11 @@ export default function TabLayout() {
 
   // ── Telas da tab bar mobile ─────────────────────────────────────────────────
   const TAB_SCREENS = [
-    { name: 'index',      title: 'Hoje',    icon: 'home'              },
-    { name: 'routines',   title: 'Rotinas', icon: 'repeat'            },
-    { name: 'objectives', title: 'Bússola', icon: 'compass'           },
-    { name: 'agenda',     title: 'Agenda',  icon: 'calendar'          },
-    { name: 'more',       title: 'Mais',    icon: 'grid-outline'      },
+    { name: 'index',      title: t('tabs.today'),   icon: 'home'         },
+    { name: 'routines',   title: t('tabs.routines'),icon: 'repeat'       },
+    { name: 'objectives', title: t('tabs.compass'), icon: 'compass'      },
+    { name: 'agenda',     title: t('tabs.agenda'),  icon: 'calendar'     },
+    { name: 'more',       title: t('tabs.more'),    icon: 'grid-outline' },
   ] as const;
 
   // ── Telas ocultas da tab bar (acessíveis via sidebar ou tela Mais) ─────────

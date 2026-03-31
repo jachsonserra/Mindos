@@ -2,7 +2,8 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { initI18n } from "../src/i18n";
 import "react-native-reanimated";
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
 import { useAutoRefresh } from "../src/hooks/useAutoRefresh";
@@ -35,16 +36,21 @@ export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+  const [i18nReady, setI18nReady] = useState(false);
 
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
   useEffect(() => {
-    if (loaded) SplashScreen.hideAsync();
-  }, [loaded]);
+    initI18n().then(() => setI18nReady(true));
+  }, []);
 
-  if (!loaded) return null;
+  useEffect(() => {
+    if (loaded && i18nReady) SplashScreen.hideAsync();
+  }, [loaded, i18nReady]);
+
+  if (!loaded || !i18nReady) return null;
 
   return <RootLayoutNav />;
 }
@@ -107,10 +113,10 @@ function RootLayoutNav() {
         });
       });
 
-    // 1. Carrega dados locais imediatamente (r‡pido, mesmo dispositivo)
+    // 1. Carrega dados locais imediatamente (rï¿½pido, mesmo dispositivo)
     loadAll();
 
-    // 2. Sincroniza com Supabase em background Ñ garante dados em novos dispositivos
+    // 2. Sincroniza com Supabase em background ï¿½ garante dados em novos dispositivos
     //    Se pulled > 0, recarrega os stores para refletir os dados novos
     syncData(uid)
       .then((result) => {

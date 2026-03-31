@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
   ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,
@@ -9,6 +10,7 @@ import { useAuthStore } from "../../src/stores/useAuthStore";
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../../src/utils/constants";
 
 export default function SignUpScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { signUp, signInWithGoogle, isLoading } = useAuthStore();
   const [name,            setName]            = useState("");
@@ -22,12 +24,12 @@ export default function SignUpScreen() {
 
   function validate() {
     const e: typeof errors = {};
-    if (!name.trim())                                    e.name            = "Nome é obrigatório";
-    if (!email.trim())                                   e.email           = "Email é obrigatório";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email           = "Email inválido";
-    if (!password)                                       e.password        = "Senha é obrigatória";
-    else if (password.length < 6)                        e.password        = "Mínimo 6 caracteres";
-    if (confirmPassword !== password)                    e.confirmPassword = "Senhas não conferem";
+    if (!name.trim())                                    e.name            = t('auth.errors.nameRequired');
+    if (!email.trim())                                   e.email           = t('auth.errors.emailRequired');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email           = t('auth.errors.emailInvalid');
+    if (!password)                                       e.password        = t('auth.errors.passwordRequired');
+    else if (password.length < 6)                        e.password        = t('auth.errors.passwordMin');
+    if (confirmPassword !== password)                    e.confirmPassword = t('auth.errors.passwordsNoMatch');
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -36,10 +38,9 @@ export default function SignUpScreen() {
     if (!validate()) return;
     try {
       await signUp(email.toLowerCase(), password);
-      // Confirmação de email desabilitada — vai direto para o app
       router.replace("/(onboarding)/welcome" as any);
     } catch (err) {
-      Alert.alert("Erro ao criar conta", err instanceof Error ? err.message : "Tente novamente");
+      Alert.alert(t('auth.errors.signUpError'), err instanceof Error ? err.message : t('auth.errors.tryAgain'));
     }
   }
 
@@ -47,7 +48,7 @@ export default function SignUpScreen() {
     try {
       await signInWithGoogle();
     } catch (err) {
-      Alert.alert("Erro com Google", err instanceof Error ? err.message : "Tente novamente");
+      Alert.alert(t('auth.errors.googleError'), err instanceof Error ? err.message : t('auth.errors.tryAgain'));
     }
   }
 
@@ -64,34 +65,34 @@ export default function SignUpScreen() {
         <View style={s.brand}>
           <View style={s.brandIcon}><View style={s.brandDot} /></View>
           <Text style={s.brandName}>MindOS</Text>
-          <Text style={s.brandTagline}>Comece sua jornada hoje</Text>
+          <Text style={s.brandTagline}>{t('auth.signUp.tagline')}</Text>
         </View>
 
         {/* Card */}
         <View style={s.card}>
-          <Text style={s.cardTitle}>Criar conta</Text>
-          <Text style={s.cardSub}>Grátis para sempre</Text>
+          <Text style={s.cardTitle}>{t('auth.signUp.title')}</Text>
+          <Text style={s.cardSub}>{t('auth.signUp.subtitle')}</Text>
 
           {/* Google button */}
           <TouchableOpacity style={[s.googleBtn, isLoading && s.btnDisabled]} onPress={handleGoogle} disabled={isLoading} activeOpacity={0.85}>
             <Text style={s.googleIcon}>G</Text>
-            <Text style={s.googleText}>Continuar com Google</Text>
+            <Text style={s.googleText}>{t('auth.continueWithGoogle')}</Text>
           </TouchableOpacity>
 
           {/* Divider */}
           <View style={s.divider}>
             <View style={s.dividerLine} />
-            <Text style={s.dividerText}>ou</Text>
+            <Text style={s.dividerText}>{t('auth.or')}</Text>
             <View style={s.dividerLine} />
           </View>
 
           {/* Nome */}
           <View style={s.field}>
-            <Text style={s.label}>Nome</Text>
+            <Text style={s.label}>{t('auth.name')}</Text>
             <View style={[s.inputWrap, errors.name && s.inputWrapError]}>
               <Ionicons name="person-outline" size={16} color={COLORS.textMuted} style={s.inputIcon} />
               <TextInput
-                style={s.input} placeholder="Seu nome" placeholderTextColor={COLORS.textMuted}
+                style={s.input} placeholder={t('auth.namePlaceholder')} placeholderTextColor={COLORS.textMuted}
                 autoCapitalize="words" value={name}
                 onChangeText={(t) => { setName(t); if (errors.name) setErrors({ ...errors, name: undefined }); }}
                 editable={!isLoading}
@@ -102,11 +103,11 @@ export default function SignUpScreen() {
 
           {/* Email */}
           <View style={s.field}>
-            <Text style={s.label}>Email</Text>
+            <Text style={s.label}>{t('auth.email')}</Text>
             <View style={[s.inputWrap, errors.email && s.inputWrapError]}>
               <Ionicons name="mail-outline" size={16} color={COLORS.textMuted} style={s.inputIcon} />
               <TextInput
-                style={s.input} placeholder="seu@email.com" placeholderTextColor={COLORS.textMuted}
+                style={s.input} placeholder={t('auth.emailPlaceholder')} placeholderTextColor={COLORS.textMuted}
                 keyboardType="email-address" autoCapitalize="none" autoComplete="email" value={email}
                 onChangeText={(t) => { setEmail(t); if (errors.email) setErrors({ ...errors, email: undefined }); }}
                 editable={!isLoading}
@@ -117,11 +118,11 @@ export default function SignUpScreen() {
 
           {/* Senha */}
           <View style={s.field}>
-            <Text style={s.label}>Senha</Text>
+            <Text style={s.label}>{t('auth.password')}</Text>
             <View style={[s.inputWrap, errors.password && s.inputWrapError]}>
               <Ionicons name="lock-closed-outline" size={16} color={COLORS.textMuted} style={s.inputIcon} />
               <TextInput
-                style={[s.input, { flex: 1 }]} placeholder="Mínimo 6 caracteres"
+                style={[s.input, { flex: 1 }]} placeholder={t('auth.passwordPlaceholder')}
                 placeholderTextColor={COLORS.textMuted} secureTextEntry={!showPass} value={password}
                 onChangeText={(t) => { setPassword(t); if (errors.password) setErrors({ ...errors, password: undefined }); }}
                 editable={!isLoading}
@@ -135,11 +136,11 @@ export default function SignUpScreen() {
 
           {/* Confirmar Senha */}
           <View style={s.field}>
-            <Text style={s.label}>Confirmar senha</Text>
+            <Text style={s.label}>{t('auth.confirmPassword')}</Text>
             <View style={[s.inputWrap, errors.confirmPassword && s.inputWrapError]}>
               <Ionicons name="shield-checkmark-outline" size={16} color={COLORS.textMuted} style={s.inputIcon} />
               <TextInput
-                style={s.input} placeholder="Repita a senha" placeholderTextColor={COLORS.textMuted}
+                style={s.input} placeholder={t('auth.confirmPasswordPlaceholder')} placeholderTextColor={COLORS.textMuted}
                 secureTextEntry={!showPass} value={confirmPassword}
                 onChangeText={(t) => { setConfirmPassword(t); if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined }); }}
                 editable={!isLoading}
@@ -151,14 +152,14 @@ export default function SignUpScreen() {
           <TouchableOpacity style={[s.btn, isLoading && s.btnDisabled]} onPress={handleSignUp} disabled={isLoading} activeOpacity={0.85}>
             {isLoading
               ? <ActivityIndicator color="#fff" size="small" />
-              : <Text style={s.btnText}>Criar conta grátis</Text>}
+              : <Text style={s.btnText}>{t('auth.signUp.button')}</Text>}
           </TouchableOpacity>
         </View>
 
         <View style={s.footer}>
-          <Text style={s.footerText}>Já tem conta? </Text>
+          <Text style={s.footerText}>{t('auth.signUp.hasAccount')}</Text>
           <TouchableOpacity onPress={() => router.replace("/(auth)/sign-in" as any)} disabled={isLoading}>
-            <Text style={s.footerLink}>Entrar</Text>
+            <Text style={s.footerLink}>{t('auth.signUp.login')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

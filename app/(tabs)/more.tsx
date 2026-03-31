@@ -2,78 +2,33 @@ import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { COLORS } from '../../src/utils/constants';
 
-const MENU_ITEMS = [
-  {
-    icon: 'checkmark-circle' as const,
-    label: 'Tarefas',
-    subtitle: 'Organize com Pareto 20%',
-    route: '/(tabs)/tasks',
-    color: '#5A8A5A',
-  },
-  {
-    icon: 'heart' as const,
-    label: 'Diário',
-    subtitle: 'Gratidão + Cookie Jar',
-    route: '/(tabs)/gratitude',
-    color: '#C4882A',
-  },
-  {
-    icon: 'book' as const,
-    label: 'Estudos',
-    subtitle: 'Pomodoro + anotações',
-    route: '/(tabs)/studies',
-    color: '#9B4A7A',
-  },
-  {
-    icon: 'bar-chart' as const,
-    label: 'Progresso',
-    subtitle: 'XP, streak e heatmap',
-    route: '/(tabs)/progress',
-    color: '#4A7A9B',
-  },
-  {
-    icon: 'trophy' as const,
-    label: 'Missões',
-    subtitle: 'Desafios e conquistas',
-    route: '/(tabs)/missions',
-    color: '#C4882A',
-  },
-  {
-    icon: 'git-network' as const,
-    label: 'Segunda Mente',
-    subtitle: 'Grafo de ideias e nós',
-    route: '/(tabs)/second-mind',
-    color: '#7A4A9B',
-  },
-  {
-    icon: 'analytics' as const,
-    label: 'Insights',
-    subtitle: 'Padrões detectados pelo app',
-    route: '/(tabs)/insights',
-    color: '#E53935',
-  },
-  {
-    icon: 'chatbubble-ellipses' as const,
-    label: 'Coach IA',
-    subtitle: 'Seu coach pessoal com contexto',
-    route: '/(tabs)/coach',
-    color: '#E53935',
-  },
+const MENU_KEYS = [
+  { icon: 'checkmark-circle' as const, labelKey: 'more.items.tasks',      route: '/(tabs)/tasks',       color: '#5A8A5A' },
+  { icon: 'heart'            as const, labelKey: 'more.items.journal',    route: '/(tabs)/gratitude',   color: '#C4882A' },
+  { icon: 'book'             as const, labelKey: 'more.items.studies',    route: '/(tabs)/studies',     color: '#9B4A7A' },
+  { icon: 'bar-chart'        as const, labelKey: 'more.items.progress',   route: '/(tabs)/progress',    color: '#4A7A9B' },
+  { icon: 'trophy'           as const, labelKey: 'more.items.missions',   route: '/(tabs)/missions',    color: '#C4882A' },
+  { icon: 'git-network'      as const, labelKey: 'more.items.secondMind', route: '/(tabs)/second-mind', color: '#7A4A9B' },
+  { icon: 'analytics'        as const, labelKey: 'more.items.insights',   route: '/(tabs)/insights',    color: '#E53935' },
+  { icon: 'chatbubble-ellipses' as const, labelKey: 'more.items.coach',   route: '/(tabs)/coach',       color: '#E53935' },
 ] as const;
 
 export default function MoreScreen() {
+  const { t } = useTranslation();
+
   return (
     <View style={s.screen}>
       <View style={s.header}>
-        <Text style={s.title}>Mais</Text>
-        <Text style={s.subtitle}>Todas as funcionalidades</Text>
+        <Text style={s.title}>{t('more.title')}</Text>
+        <Text style={s.subtitle}>{t('more.subtitle')}</Text>
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.grid}>
-          {MENU_ITEMS.map((item) => (
+          {MENU_KEYS.map((item) => (
             <TouchableOpacity
               key={item.route}
               style={s.card}
@@ -82,18 +37,16 @@ export default function MoreScreen() {
               <View style={[s.iconWrap, { backgroundColor: `${item.color}18` }]}>
                 <Ionicons name={item.icon} size={28} color={item.color} />
               </View>
-              <Text style={s.cardLabel}>{item.label}</Text>
-              <Text style={s.cardSub}>{item.subtitle}</Text>
+              <Text style={s.cardLabel}>{t(`${item.labelKey}.label` as any)}</Text>
+              <Text style={s.cardSub}>{t(`${item.labelKey}.subtitle` as any)}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* Dica */}
+        {/* Tip */}
         <View style={s.tipCard}>
-          <Text style={s.tipTitle}>💡 Dica de produtividade</Text>
-          <Text style={s.tipText}>
-            "Toda semana, 3 ações garantem 80% do resultado. Qual hábito diário puxa o resto?"
-          </Text>
+          <Text style={s.tipTitle}>{t('more.tip.title')}</Text>
+          <Text style={s.tipText}>{t('more.tip.text')}</Text>
         </View>
 
         <View style={{ height: 100 }} />

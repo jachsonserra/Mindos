@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   ActivityIndicator,
@@ -14,19 +15,20 @@ import { useAuthStore } from "../src/stores/useAuthStore";
 import { useUserStore } from "../src/stores/useUserStore";
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../src/utils/constants";
 
-const FEATURES = [
-  { icon: "flame-outline",         color: "#FF6B35", title: "Hábitos & Rotinas",  desc: "Construa hábitos com gamificação e streaks diários" },
-  { icon: "trophy-outline",        color: "#FFD700", title: "XP & Missões",       desc: "Ganhe pontos por cada conquista e suba de nível" },
-  { icon: "flag-outline",          color: "#4ECDC4", title: "Metas SMARTER",      desc: "Defina e acompanhe objetivos com checkpoints reais" },
-  { icon: "hardware-chip-outline", color: "#A78BFA", title: "Coach IA",           desc: "Assistente mental que te conhece de verdade" },
-  { icon: "albums-outline",        color: "#34D399", title: "Second Mind",        desc: "Notas, ideias e pensamentos sempre organizados" },
-  { icon: "heart-outline",         color: "#F87171", title: "Gratidão Diária",    desc: "Diário de gratidão para manter o foco no positivo" },
-];
-
 export default function Index() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { isLoading: authLoading, isOnboarded, authUserId } = useUserStore();
   const { session, isLoading: sessionLoading } = useAuthStore();
+
+  const FEATURES = [
+    { icon: "flame-outline",         color: "#FF6B35", titleKey: "landing.features.habits.title",   descKey: "landing.features.habits.desc" },
+    { icon: "trophy-outline",        color: "#FFD700", titleKey: "landing.features.xp.title",       descKey: "landing.features.xp.desc" },
+    { icon: "flag-outline",          color: "#4ECDC4", titleKey: "landing.features.goals.title",    descKey: "landing.features.goals.desc" },
+    { icon: "hardware-chip-outline", color: "#A78BFA", titleKey: "landing.features.coach.title",    descKey: "landing.features.coach.desc" },
+    { icon: "albums-outline",        color: "#34D399", titleKey: "landing.features.mind.title",     descKey: "landing.features.mind.desc" },
+    { icon: "heart-outline",         color: "#F87171", titleKey: "landing.features.gratitude.title", descKey: "landing.features.gratitude.desc" },
+  ];
 
   useEffect(() => {
     if (sessionLoading || authLoading) return;
@@ -66,52 +68,49 @@ export default function Index() {
           <View style={s.logoDot} />
         </View>
         <Text style={s.heroTitle}>MindOS</Text>
-        <Text style={s.heroSub}>Sua mente. Organizada.</Text>
-        <Text style={s.heroDesc}>
-          O sistema operacional da sua vida — hábitos, metas, XP e inteligência artificial em um só lugar.
-        </Text>
+        <Text style={s.heroSub}>{t('landing.tagline')}</Text>
+        <Text style={s.heroDesc}>{t('landing.description')}</Text>
 
         <Pressable
           style={({ pressed }) => [s.btnPrimary, pressed && s.pressed]}
           onPress={() => router.push("/(auth)/sign-up" as any)}
         >
           <Ionicons name="rocket-outline" size={18} color="#fff" />
-          <Text style={s.btnPrimaryText}>Começar agora — é grátis</Text>
+          <Text style={s.btnPrimaryText}>{t('landing.ctaStart')}</Text>
         </Pressable>
 
         <Pressable
           style={({ pressed }) => [s.btnSecondary, pressed && s.pressed]}
           onPress={() => router.push("/(auth)/sign-in" as any)}
         >
-          <Text style={s.btnSecondaryText}>Já tenho conta</Text>
+          <Text style={s.btnSecondaryText}>{t('landing.ctaLogin')}</Text>
         </Pressable>
       </Animated.View>
 
       {/* Stats */}
       <View style={s.statsRow}>
         {[
-          { value: "28",   label: "módulos"  },
-          { value: "∞",    label: "hábitos"  },
-          { value: "100%", label: "privado"  },
+          { value: "28", labelKey: "landing.stats.modules" },
+          { value: "∞",  labelKey: "landing.stats.habits"  },
+          { value: "100%", labelKey: "landing.stats.private" },
         ].map((stat) => (
-          <View key={stat.label} style={s.statItem}>
+          <View key={stat.labelKey} style={s.statItem}>
             <Text style={s.statValue}>{stat.value}</Text>
-            <Text style={s.statLabel}>{stat.label}</Text>
+            <Text style={s.statLabel}>{t(stat.labelKey as any)}</Text>
           </View>
         ))}
       </View>
 
       {/* Features */}
       <View style={s.section}>
-        <Text style={s.sectionTitle}>Tudo que você precisa</Text>
         <View style={s.grid}>
           {FEATURES.map((f) => (
-            <View key={f.title} style={s.card}>
+            <View key={f.titleKey} style={s.card}>
               <View style={[s.cardIcon, { backgroundColor: f.color + "22" }]}>
                 <Ionicons name={f.icon as any} size={24} color={f.color} />
               </View>
-              <Text style={s.cardTitle}>{f.title}</Text>
-              <Text style={s.cardDesc}>{f.desc}</Text>
+              <Text style={s.cardTitle}>{t(f.titleKey as any)}</Text>
+              <Text style={s.cardDesc}>{t(f.descKey as any)}</Text>
             </View>
           ))}
         </View>
@@ -119,15 +118,13 @@ export default function Index() {
 
       {/* Bottom CTA */}
       <View style={s.bottomCta}>
-        <Text style={s.bottomCtaTitle}>Pronto para organizar sua mente?</Text>
         <Pressable
           style={({ pressed }) => [s.btnPrimary, s.btnLarge, pressed && s.pressed]}
           onPress={() => router.push("/(auth)/sign-up" as any)}
         >
           <Ionicons name="person-add-outline" size={18} color="#fff" />
-          <Text style={s.btnPrimaryText}>Criar conta grátis</Text>
+          <Text style={s.btnPrimaryText}>{t('auth.signUp.button')}</Text>
         </Pressable>
-        <Text style={s.bottomNote}>Sem cartão de crédito. Sem prazo.</Text>
       </View>
     </ScrollView>
   );
@@ -198,7 +195,6 @@ const s = StyleSheet.create({
   statLabel: { ...TYPOGRAPHY.caption, color: COLORS.textMuted },
 
   section:      { paddingHorizontal: SPACING.xl, marginBottom: SPACING.xxl },
-  sectionTitle: { ...TYPOGRAPHY.h3, color: COLORS.text, marginBottom: SPACING.lg },
 
   grid: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.md },
   card: {
@@ -218,6 +214,4 @@ const s = StyleSheet.create({
     paddingTop: SPACING.xl,
     borderTopWidth: 1, borderTopColor: COLORS.border,
   },
-  bottomCtaTitle: { ...TYPOGRAPHY.h3, color: COLORS.text, textAlign: "center" },
-  bottomNote:     { ...TYPOGRAPHY.caption, color: COLORS.textMuted },
 });

@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ScrollView, View, Text, StyleSheet, TouchableOpacity,
   SafeAreaView, Modal, TextInput, Alert,
@@ -18,12 +19,17 @@ import type { Mission, Reward } from '../../src/types/gamification.types';
 const MISSION_ICONS: Record<Mission['type'], string> = {
   daily: '☀️', weekly: '📅', challenge: '⚔️', phase: '🌟',
 };
-const MISSION_TYPE_LABELS: Record<Mission['type'], string> = {
-  daily: 'Diária', weekly: 'Semanal', challenge: 'Desafio', phase: 'Fase',
-};
+// Mission type labels are now i18n-aware — resolved inside component
 
 export default function MissionsScreen() {
+  const { t } = useTranslation();
   const user = useUserStore(s => s.user);
+  const MISSION_TYPE_LABELS: Record<Mission['type'], string> = {
+    daily: t('missions.types.daily'),
+    weekly: t('missions.types.weekly'),
+    challenge: t('missions.types.challenge'),
+    phase: t('missions.types.phase'),
+  };
   const { missions, rewards, userXP, todayXPEarned, loadData, completeMission, createReward, unlockReward } = useGamificationStore();
   const [showAddReward, setShowAddReward] = useState(false);
   const [rewardTitle, setRewardTitle] = useState('');
@@ -74,7 +80,7 @@ export default function MissionsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <Text style={styles.pageTitle}>🎯 Missões</Text>
+        <Text style={styles.pageTitle}>{t('missions.title')}</Text>
 
         {/* XP Banner melhorado */}
         <Card style={styles.xpBanner} variant="elevated">
@@ -84,11 +90,11 @@ export default function MissionsScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.xpLevelTitle}>{levelTitle}</Text>
-              <Text style={styles.xpLevelSub}>{totalXP} XP total</Text>
+              <Text style={styles.xpLevelSub}>{totalXP} {t('missions.xpTotal')}</Text>
             </View>
             <View style={styles.xpTodayPill}>
               <Text style={styles.xpTodayVal}>+{xpToday}</Text>
-              <Text style={styles.xpTodayLbl}>hoje</Text>
+              <Text style={styles.xpTodayLbl}>{t('missions.today')}</Text>
             </View>
           </View>
           <ProgressBar
@@ -97,12 +103,12 @@ export default function MissionsScreen() {
             color={COLORS.primary}
             height={8}
             showLabel
-            label={`${currentLevelXP} / ${xpToNext} XP → Nível ${level + 1}`}
+            label={`${currentLevelXP} / ${xpToNext} XP → ${t('missions.toLevel')} ${level + 1}`}
           />
         </Card>
 
         {/* Missões Ativas */}
-        <Text style={styles.sectionTitle}>Missões Ativas ({activeMissions.length})</Text>
+        <Text style={styles.sectionTitle}>{t('missions.activeMissions')} ({activeMissions.length})</Text>
 
         {activeMissions.map(mission => {
           const pct = mission.requirementValue > 0
@@ -157,7 +163,7 @@ export default function MissionsScreen() {
                       style={styles.claimBtn}
                       onPress={() => completeMission(mission.id, user.id)}
                     >
-                      <Text style={styles.claimBtnTxt}>Resgatar!</Text>
+                      <Text style={styles.claimBtnTxt}>{t('missions.claim')}</Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -168,15 +174,15 @@ export default function MissionsScreen() {
 
         {activeMissions.length === 0 && (
           <Card style={styles.emptyCard}>
-            <Text style={styles.emptyText}>Nenhuma missão ativa. Volte amanhã!</Text>
+            <Text style={styles.emptyText}>{t('missions.noActive')}</Text>
           </Card>
         )}
 
         {/* Mural de Recompensas */}
         <View style={styles.rewardHeader}>
-          <Text style={styles.sectionTitle}>Mural de Recompensas</Text>
+          <Text style={styles.sectionTitle}>{t('missions.rewardWall')}</Text>
           <TouchableOpacity onPress={() => setShowAddReward(true)} style={styles.addRewardBtn}>
-            <Text style={styles.addRewardBtnText}>+ Adicionar</Text>
+            <Text style={styles.addRewardBtnText}>{t('missions.addReward')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -196,14 +202,14 @@ export default function MissionsScreen() {
                 <Text style={styles.rewardDesc} numberOfLines={2}>{reward.description}</Text>
               )}
               {reward.isUnlocked && (
-                <Text style={styles.rewardUnlockedBadge}>✓ Conquistado!</Text>
+                <Text style={styles.rewardUnlockedBadge}>{t('missions.reward.unlocked')}</Text>
               )}
             </TouchableOpacity>
           ))}
 
           <TouchableOpacity style={styles.addRewardCard} onPress={() => setShowAddReward(true)}>
             <Text style={styles.addRewardCardIcon}>+</Text>
-            <Text style={styles.addRewardCardText}>Nova recompensa</Text>
+            <Text style={styles.addRewardCardText}>{t('missions.reward.newReward')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -211,7 +217,7 @@ export default function MissionsScreen() {
         {completedMissions.length > 0 && (
           <>
             <Text style={[styles.sectionTitle, { marginTop: 16 }]}>
-              Completadas ({completedMissions.length})
+              {t('missions.completedMissions')} ({completedMissions.length})
             </Text>
             {completedMissions.slice(0, 5).map(mission => (
               <Card key={mission.id} style={[styles.missionCard, styles.missionCompleted]} variant="bordered">
@@ -219,7 +225,7 @@ export default function MissionsScreen() {
                   <Text style={styles.missionIcon}>{MISSION_ICONS[mission.type]}</Text>
                   <View style={{ flex: 1 }}>
                     <View style={styles.missionTitleRow}>
-                      <Badge label="✓ Completa" color={COLORS.success} size="sm" />
+                      <Badge label={t('missions.completed')} color={COLORS.success} size="sm" />
                       <Text style={styles.missionXP}>+{mission.xpReward} XP</Text>
                     </View>
                     <Text style={[styles.missionTitle, styles.missionTitleDone]}>{mission.title}</Text>
@@ -238,25 +244,25 @@ export default function MissionsScreen() {
             <TouchableOpacity onPress={() => setShowAddReward(false)}>
               <Text style={styles.modalClose}>✕</Text>
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>Nova Recompensa</Text>
+            <Text style={styles.modalTitle}>{t('missions.modal.newReward')}</Text>
             <View style={{ width: 32 }} />
           </View>
 
           <ScrollView style={styles.modalContent}>
-            <Text style={styles.inputLabel}>O que você vai ganhar?</Text>
+            <Text style={styles.inputLabel}>{t('missions.modal.whatYouGet')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Ex: Assistir 1 episódio da série favorita"
+              placeholder={t('missions.modal.rewardPlaceholder')}
               placeholderTextColor={COLORS.textSecondary}
               value={rewardTitle}
               onChangeText={setRewardTitle}
               autoFocus
             />
 
-            <Text style={styles.inputLabel}>Descrição (opcional)</Text>
+            <Text style={styles.inputLabel}>{t('missions.modal.descLabel')}</Text>
             <TextInput
               style={[styles.input, styles.textarea]}
-              placeholder="Detalhes da recompensa..."
+              placeholder={t('missions.modal.descPlaceholder')}
               placeholderTextColor={COLORS.textSecondary}
               value={rewardDesc}
               onChangeText={setRewardDesc}
@@ -264,13 +270,11 @@ export default function MissionsScreen() {
             />
 
             <View style={styles.tipBox}>
-              <Text style={styles.tipText}>
-                💡 Missão Mural: vincule uma recompensa a uma missão (ex: "estudar 30min = jogar 20min")
-              </Text>
+              <Text style={styles.tipText}>{t('missions.modal.tip')}</Text>
             </View>
 
             <Button
-              title="Criar Recompensa"
+              title={t('missions.modal.createBtn')}
               onPress={handleCreateReward}
               disabled={!rewardTitle.trim()}
               size="lg"
@@ -284,13 +288,13 @@ export default function MissionsScreen() {
       <Modal visible={!!pendingReward} transparent animationType="fade">
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: 32 }}>
           <View style={{ backgroundColor: COLORS.surface, borderRadius: 20, padding: 24, width: '100%', maxWidth: 360, gap: 14 }}>
-            <Text style={{ fontSize: 18, fontWeight: '800', color: COLORS.text, textAlign: 'center' }}>🎁 Desbloquear recompensa?</Text>
+            <Text style={{ fontSize: 18, fontWeight: '800', color: COLORS.text, textAlign: 'center' }}>{t('missions.reward.unlockTitle')}</Text>
             <Text style={{ fontSize: 15, color: COLORS.text, textAlign: 'center', fontWeight: '600' }} numberOfLines={2}>
               "{pendingReward?.title}"
             </Text>
             {!!pendingReward?.xpCost && (
               <Text style={{ fontSize: 13, color: COLORS.textSecondary, textAlign: 'center' }}>
-                Custa {pendingReward.xpCost} XP
+                {t('missions.reward.xpCost', { cost: pendingReward.xpCost })}
               </Text>
             )}
             <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -298,13 +302,13 @@ export default function MissionsScreen() {
                 style={{ flex: 1, paddingVertical: 14, borderRadius: 12, backgroundColor: COLORS.surfaceAlt, alignItems: 'center' }}
                 onPress={() => setPendingReward(null)}
               >
-                <Text style={{ fontSize: 15, fontWeight: '600', color: COLORS.text }}>Cancelar</Text>
+                <Text style={{ fontSize: 15, fontWeight: '600', color: COLORS.text }}>{t('missions.reward.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={{ flex: 1, paddingVertical: 14, borderRadius: 12, backgroundColor: COLORS.primary, alignItems: 'center' }}
                 onPress={() => { if (pendingReward && user) { unlockReward(pendingReward.id, user.id); } setPendingReward(null); }}
               >
-                <Text style={{ fontSize: 15, fontWeight: '700', color: '#fff' }}>Desbloquear! 🎉</Text>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: '#fff' }}>{t('missions.reward.unlock')}</Text>
               </TouchableOpacity>
             </View>
           </View>

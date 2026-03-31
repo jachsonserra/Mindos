@@ -2,6 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useLanguageStore } from "../../src/stores/useLanguageStore";
 import {
     ActivityIndicator,
     Alert,
@@ -525,6 +527,8 @@ function WhyDiscoveryModal({
 
 // ─── Tela Principal ────────────────────────────────────────────────────────────
 export default function SettingsScreen() {
+  const { t } = useTranslation();
+  const { language, setLanguage } = useLanguageStore();
   const router = useRouter();
   const { user, updateUser } = useUserStore();
   const { signOut, session } = useAuthStore();
@@ -840,7 +844,29 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={s.content}
       >
-        <Text style={s.pageTitle}>⚙️ Configurações</Text>
+        <Text style={s.pageTitle}>⚙️ {t('settings.title')}</Text>
+
+        {/* ─── IDIOMA ─── */}
+        <Text style={s.sectionTitle}>{t('settings.language.title').toUpperCase()}</Text>
+        <View style={s.card}>
+          <Text style={s.settingLabel}>{t('settings.language.subtitle')}</Text>
+          <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+            {(['pt', 'en'] as const).map((lang) => (
+              <TouchableOpacity
+                key={lang}
+                style={[
+                  s.langBtn,
+                  language === lang && s.langBtnActive,
+                ]}
+                onPress={() => setLanguage(lang)}
+              >
+                <Text style={[s.langBtnText, language === lang && s.langBtnTextActive]}>
+                  {lang === 'pt' ? '🇧🇷 Português' : '🇺🇸 English'}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
         {/* ─── PERFIL ─── */}
         <Text style={s.sectionTitle}>MEU PERFIL</Text>
@@ -2059,6 +2085,15 @@ export default function SettingsScreen() {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   content: { padding: 20, paddingBottom: 60 },
+  settingLabel: { fontSize: 13, color: COLORS.textSecondary },
+  langBtn: {
+    flex: 1, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10,
+    borderWidth: 1, borderColor: COLORS.border, alignItems: 'center',
+    backgroundColor: COLORS.surfaceAlt,
+  },
+  langBtnActive: { borderColor: COLORS.primary, backgroundColor: COLORS.primaryMuted },
+  langBtnText: { fontSize: 14, fontWeight: '600', color: COLORS.textSecondary },
+  langBtnTextActive: { color: COLORS.primary },
   pageTitle: {
     fontSize: 26,
     fontWeight: "800",

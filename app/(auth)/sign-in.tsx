@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
   ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,
@@ -9,6 +10,7 @@ import { useAuthStore } from "../../src/stores/useAuthStore";
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../../src/utils/constants";
 
 export default function SignInScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { signIn, signInWithGoogle, isLoading } = useAuthStore();
   const [email, setEmail]       = useState("");
@@ -18,10 +20,10 @@ export default function SignInScreen() {
 
   function validate() {
     const e: typeof errors = {};
-    if (!email.trim()) e.email = "Email é obrigatório";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Email inválido";
-    if (!password) e.password = "Senha é obrigatória";
-    else if (password.length < 6) e.password = "Mínimo 6 caracteres";
+    if (!email.trim()) e.email = t('auth.errors.emailRequired');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = t('auth.errors.emailInvalid');
+    if (!password) e.password = t('auth.errors.passwordRequired');
+    else if (password.length < 6) e.password = t('auth.errors.passwordMin');
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -32,7 +34,7 @@ export default function SignInScreen() {
       await signIn(email.toLowerCase(), password);
       router.replace("/(tabs)" as any);
     } catch (err) {
-      Alert.alert("Erro ao entrar", err instanceof Error ? err.message : "Tente novamente");
+      Alert.alert(t('auth.errors.signInError'), err instanceof Error ? err.message : t('auth.errors.tryAgain'));
     }
   }
 
@@ -40,7 +42,7 @@ export default function SignInScreen() {
     try {
       await signInWithGoogle();
     } catch (err) {
-      Alert.alert("Erro com Google", err instanceof Error ? err.message : "Tente novamente");
+      Alert.alert(t('auth.errors.googleError'), err instanceof Error ? err.message : t('auth.errors.tryAgain'));
     }
   }
 
@@ -57,41 +59,41 @@ export default function SignInScreen() {
         <View style={s.brand}>
           <View style={s.brandIcon}><View style={s.brandDot} /></View>
           <Text style={s.brandName}>MindOS</Text>
-          <Text style={s.brandTagline}>Sua mente. Organizada.</Text>
+          <Text style={s.brandTagline}>{t('landing.tagline')}</Text>
         </View>
 
         {/* Card */}
         <View style={s.card}>
-          <Text style={s.cardTitle}>Entrar</Text>
-          <Text style={s.cardSub}>Bem-vindo de volta</Text>
+          <Text style={s.cardTitle}>{t('auth.signIn.title')}</Text>
+          <Text style={s.cardSub}>{t('auth.signIn.subtitle')}</Text>
 
           {/* Google */}
           <TouchableOpacity style={[s.googleBtn, isLoading && s.btnDisabled]} onPress={handleGoogle} disabled={isLoading} activeOpacity={0.85}>
             <Text style={s.googleIcon}>G</Text>
-            <Text style={s.googleText}>Continuar com Google</Text>
+            <Text style={s.googleText}>{t('auth.continueWithGoogle')}</Text>
           </TouchableOpacity>
 
           {/* Divisor */}
           <View style={s.divider}>
             <View style={s.dividerLine} />
-            <Text style={s.dividerText}>ou</Text>
+            <Text style={s.dividerText}>{t('auth.or')}</Text>
             <View style={s.dividerLine} />
           </View>
 
           {/* Email */}
           <View style={s.field}>
-            <Text style={s.label}>Email</Text>
+            <Text style={s.label}>{t('auth.email')}</Text>
             <View style={[s.inputWrap, errors.email && s.inputWrapError]}>
               <Ionicons name="mail-outline" size={16} color={COLORS.textMuted} style={s.inputIcon} />
               <TextInput
                 style={s.input}
-                placeholder="seu@email.com"
+                placeholder={t('auth.emailPlaceholder')}
                 placeholderTextColor={COLORS.textMuted}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
                 value={email}
-                onChangeText={(t) => { setEmail(t); if (errors.email) setErrors({ ...errors, email: undefined }); }}
+                onChangeText={(v) => { setEmail(v); if (errors.email) setErrors({ ...errors, email: undefined }); }}
                 editable={!isLoading}
               />
             </View>
@@ -100,17 +102,17 @@ export default function SignInScreen() {
 
           {/* Senha */}
           <View style={s.field}>
-            <Text style={s.label}>Senha</Text>
+            <Text style={s.label}>{t('auth.password')}</Text>
             <View style={[s.inputWrap, errors.password && s.inputWrapError]}>
               <Ionicons name="lock-closed-outline" size={16} color={COLORS.textMuted} style={s.inputIcon} />
               <TextInput
                 style={[s.input, { flex: 1 }]}
-                placeholder="Mínimo 6 caracteres"
+                placeholder={t('auth.passwordPlaceholder')}
                 placeholderTextColor={COLORS.textMuted}
                 secureTextEntry={!showPass}
                 autoComplete="password"
                 value={password}
-                onChangeText={(t) => { setPassword(t); if (errors.password) setErrors({ ...errors, password: undefined }); }}
+                onChangeText={(v) => { setPassword(v); if (errors.password) setErrors({ ...errors, password: undefined }); }}
                 editable={!isLoading}
               />
               <TouchableOpacity onPress={() => setShowPass((v) => !v)} style={s.eyeBtn}>
@@ -121,18 +123,18 @@ export default function SignInScreen() {
           </View>
 
           <TouchableOpacity onPress={() => router.push("/(auth)/reset-password" as any)} style={s.forgotBtn} disabled={isLoading}>
-            <Text style={s.forgotText}>Esqueceu a senha?</Text>
+            <Text style={s.forgotText}>{t('auth.signIn.forgotPassword')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={[s.btn, isLoading && s.btnDisabled]} onPress={handleSignIn} disabled={isLoading} activeOpacity={0.85}>
-            {isLoading ? <ActivityIndicator color="#fff" size="small" /> : <Text style={s.btnText}>Entrar</Text>}
+            {isLoading ? <ActivityIndicator color="#fff" size="small" /> : <Text style={s.btnText}>{t('auth.signIn.button')}</Text>}
           </TouchableOpacity>
         </View>
 
         <View style={s.footer}>
-          <Text style={s.footerText}>Não tem conta? </Text>
+          <Text style={s.footerText}>{t('auth.signIn.noAccount')}</Text>
           <TouchableOpacity onPress={() => router.push("/(auth)/sign-up" as any)} disabled={isLoading}>
-            <Text style={s.footerLink}>Criar conta</Text>
+            <Text style={s.footerLink}>{t('auth.signIn.createAccount')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
