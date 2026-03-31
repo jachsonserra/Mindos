@@ -1,0 +1,81 @@
+# MindOS — Electron Builder Configuration
+# Gera instaladores nativos para macOS (.dmg), Windows (.exe) e Linux (.AppImage)
+# Documentação: https://www.electron.build/
+
+appId: com.mindos.app
+productName: MindOS
+copyright: "Copyright © 2025 MindOS"
+
+# Diretório com os arquivos do app (excluindo node_modules)
+directories:
+  output: release
+  buildResources: assets
+
+# Arquivos a incluir no pacote
+files:
+  - electron/**/*
+  - dist/**/*
+  - assets/**/*
+  - package.json
+  - "!node_modules/**/*"
+  - "!ios/**/*"
+  - "!android/**/*"
+  - "!src/**/*"
+  - "!app/**/*"
+
+# Ponto de entrada
+extraMetadata:
+  main: electron/main.js
+
+# ─── macOS ────────────────────────────────────────────────────────────────────
+mac:
+  category: public.app-category.productivity
+  icon: assets/images/icon.png
+  target:
+    - target: dmg
+      arch: [x64, arm64]   # Intel + Apple Silicon (universal)
+    - target: zip
+      arch: [x64, arm64]
+
+dmg:
+  contents:
+    - x: 410
+      y: 150
+      type: link
+      path: /Applications
+    - x: 130
+      y: 150
+      type: file
+  window:
+    width: 540
+    height: 380
+
+# ─── Windows ──────────────────────────────────────────────────────────────────
+win:
+  icon: assets/images/icon.png
+  target:
+    - target: nsis
+      arch: [x64]
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  installerLanguages: [pt_BR, en_US]
+  language: 1046          # pt-BR
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: MindOS
+
+# ─── Linux ────────────────────────────────────────────────────────────────────
+linux:
+  icon: assets/images/icon.png
+  category: Office
+  target:
+    - AppImage
+    - deb
+
+# ─── Publicação (opcional — GitHub Releases) ──────────────────────────────────
+# publish:
+#   provider: github
+#   owner: seu-usuario
+#   repo: mindos

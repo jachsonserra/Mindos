@@ -4,7 +4,6 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
-
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
 import { useAutoRefresh } from "../src/hooks/useAutoRefresh";
 import { useDailyReset } from "../src/hooks/useDailyReset";
@@ -20,10 +19,10 @@ import { useSmarterGoalStore } from "../src/stores/useSmarterGoalStore";
 import { useStudyStore } from "../src/stores/useStudyStore";
 import { useTaskStore } from "../src/stores/useTaskStore";
 import { useUserStore } from "../src/stores/useUserStore";
+import { syncData } from "../src/services/sync/syncService";
 import { COLORS } from "../src/utils/constants";
 import { today } from "../src/utils/dateHelpers";
 
-// Re-exporta ErrorBoundary customizado no lugar do padrão do expo-router
 export { ErrorBoundary };
 
 export const unstable_settings = {
@@ -53,26 +52,24 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const { session, restoreSession, isLoading: authLoading } = useAuthStore();
   const { user, loadUser } = useUserStore();
-  const loadHabits = useHabitStore((s) => s.loadData);
+  const loadHabits       = useHabitStore((s) => s.loadData);
   const loadGamification = useGamificationStore((s) => s.loadData);
-  const loadSecondMind = useSecondMindStore((s) => s.loadData);
-  const loadTasks = useTaskStore((s) => s.loadData);
-  const loadAgenda = useAgendaStore((s) => s.loadByDate);
-  const loadObjectives = useObjectiveStore((s) => s.loadData);
+  const loadSecondMind   = useSecondMindStore((s) => s.loadData);
+  const loadTasks        = useTaskStore((s) => s.loadData);
+  const loadAgenda       = useAgendaStore((s) => s.loadByDate);
+  const loadObjectives   = useObjectiveStore((s) => s.loadData);
   const loadSmarterGoals = useSmarterGoalStore((s) => s.loadData);
-  const loadStudy = useStudyStore((s) => s.loadData);
-  const loadGratitude = useGratitudeStore((s) => s.loadData);
-  const loadBrain = useBrainStore((s) => s.loadData);
+  const loadStudy        = useStudyStore((s) => s.loadData);
+  const loadGratitude    = useGratitudeStore((s) => s.loadData);
+  const loadBrain        = useBrainStore((s) => s.loadData);
 
   useDailyReset();
   useAutoRefresh();
 
-  // Restaurar sessão ao abrir app
   useEffect(() => {
     restoreSession();
   }, [restoreSession]);
 
-  // Carregar dados do usuário local (sincronizado com auth)
   useEffect(() => {
     if (session?.user.id) {
       loadUser(session.user.id);
@@ -80,46 +77,51 @@ function RootLayoutNav() {
   }, [session?.user.id]);
 
   useEffect(() => {
-    if (!user?.id) return; // Sem usuário logado, não carrega nada.
+    if (!user?.id) return;
 
-    const uid = user.id;
+    const uid      = user.id;
     const todayStr = today();
 
-    // CORREÇÃO: antes, todas as funções eram chamadas sem await e sem catch.
-    // Se qualquer uma falhasse (banco não inicializado, rede, etc.), o erro
-    // seria silenciado e o app ficaria vazio sem nenhuma indicação ao usuário.
-    //
-    // SOLUÇÃO: Promise.allSettled() — diferença crucial em relação a Promise.all():
-    //   Promise.all()        → se UMA falhar, todas param e o erro propaga.
-    //   Promise.allSettled() → TODAS rodam; ao final, sabemos o status de cada uma.
-    //
-    // Isso garante que se um load falhar, os outros ainda carregam.
-    // Em um app com muitos módulos independentes, falhar tudo por um erro
-    // em um único módulo seria uma péssima experiência de usuário.
-    Promise.allSettled([
-      loadHabits(uid),
-      loadGamification(uid),
-      loadSecondMind(uid),
-      loadTasks(uid),
-      loadAgenda(uid, todayStr),
-      loadObjectives(uid),
-      loadSmarterGoals(uid),
-      loadStudy(uid),
-      loadGratitude(uid),
-      loadBrain(uid),
-    ]).then((results) => {
-      // Iteramos sobre os resultados para logar qualquer falha.
-      results.forEach((result, index) => {
-        if (result.status === "rejected") {
-          const loadNames = [
-            "loadHabits", "loadGamification", "loadSecondMind",
-            "loadTasks", "loadAgenda", "loadObjectives", "loadSmarterGoals",
-            "loadStudy", "loadGratitude", "loadBrain",
-          ];
-          console.error(`[_layout] ${loadNames[index]} falhou:`, result.reason);
-        }
+    const loadAll = () =>
+      Promise.allSettled([
+        loadHabits(uid),
+        loadGamification(uid),
+        loadSecondMind(uid),
+        loadTasks(uid),
+        loadAgenda(uid, todayStr),
+        loadObjectives(uid),
+        loadSmarterGoals(uid),
+        loadStudy(uid),
+        loadGratitude(uid),
+        loadBrain(uid),
+      ]).then((results) => {
+        results.forEach((result, index) => {
+          if (result.status === "rejected") {
+            const names = [
+              "loadHabits", "loadGamification", "loadSecondMind",
+              "loadTasks", "loadAgenda", "loadObjectives", "loadSmarterGoals",
+              "loadStudy", "loadGratitude", "loadBrain",
+            ];
+            console.error(`[_layout] ${names[index]} falhou:`, result.reason);
+          }
+        });
       });
-    });
+
+    // 1. Carrega dados locais imediatamente (r�pido, mesmo dispositivo)
+    loadAll();
+
+    // 2. Sincroniza com Supabase em background � garante dados em novos dispositivos
+    //    Se pulled > 0, recarrega os stores para refletir os dados novos
+    syncData(uid)
+      .then((result) => {
+        const hadNewData = result.tables && result.tables.some(
+          (t) => t.pulled > 0
+        );
+        if (result.status === "success" && hadNewData) {
+          loadAll();
+        }
+      })
+      .catch((e) => console.warn("[_layout] Sync background error:", e));
   }, [user?.id]);
 
   return (
@@ -127,25 +129,19 @@ function RootLayoutNav() {
       <StatusBar style="light" backgroundColor={COLORS.background} />
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: COLORS.surface },
-          headerTintColor: COLORS.text,
+          headerStyle:      { backgroundColor: COLORS.surface },
+          headerTintColor:  COLORS.text,
           headerTitleStyle: { fontWeight: "700", color: COLORS.text },
-          contentStyle: { backgroundColor: COLORS.background },
+          contentStyle:     { backgroundColor: COLORS.background },
         }}
       >
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="modal"
-          options={{ presentation: "modal", headerShown: false }}
-        />
-        <Stack.Screen
-          name="modals"
-          options={{ presentation: "modal", headerShown: false }}
-        />
-        <Stack.Screen name="settings" options={{ headerShown: false }} />
+        <Stack.Screen name="index"          options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)"         options={{ headerShown: false }} />
+        <Stack.Screen name="(onboarding)"   options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
+        <Stack.Screen name="modal"          options={{ presentation: "modal", headerShown: false }} />
+        <Stack.Screen name="modals"         options={{ presentation: "modal", headerShown: false }} />
+        <Stack.Screen name="settings"       options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
     </>
