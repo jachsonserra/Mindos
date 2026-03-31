@@ -22,12 +22,12 @@ export default function SignUpScreen() {
 
   function validate() {
     const e: typeof errors = {};
-    if (!name.trim())                                    e.name            = "Nome é obrigatório";
-    if (!email.trim())                                   e.email           = "Email é obrigatório";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email           = "Email inválido";
-    if (!password)                                       e.password        = "Senha é obrigatória";
-    else if (password.length < 6)                        e.password        = "Mínimo 6 caracteres";
-    if (confirmPassword !== password)                    e.confirmPassword = "Senhas não conferem";
+    if (!name.trim())                                    e.name            = "Nome √© obrigat√≥rio";
+    if (!email.trim())                                   e.email           = "Email √© obrigat√≥rio";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email           = "Email inv√°lido";
+    if (!password)                                       e.password        = "Senha √© obrigat√≥ria";
+    else if (password.length < 6)                        e.password        = "M√≠nimo 6 caracteres";
+    if (confirmPassword !== password)                    e.confirmPassword = "Senhas n√£o conferem";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -36,7 +36,7 @@ export default function SignUpScreen() {
     if (!validate()) return;
     try {
       await signUp(email.toLowerCase(), password);
-      // Confirmação de email desabilitada — vai direto para o app
+      // Confirma√ß√£o de email desabilitada ‚Äî vai direto para o app
       router.replace("/(onboarding)/welcome" as any);
     } catch (err) {
       Alert.alert("Erro ao criar conta", err instanceof Error ? err.message : "Tente novamente");
@@ -70,7 +70,7 @@ export default function SignUpScreen() {
         {/* Card */}
         <View style={s.card}>
           <Text style={s.cardTitle}>Criar conta</Text>
-          <Text style={s.cardSub}>Grátis para sempre</Text>
+          <Text style={s.cardSub}>Gr√°tis para sempre</Text>
 
           {/* Google button */}
           <TouchableOpacity style={[s.googleBtn, isLoading && s.btnDisabled]} onPress={handleGoogle} disabled={isLoading} activeOpacity={0.85}>
@@ -121,7 +121,7 @@ export default function SignUpScreen() {
             <View style={[s.inputWrap, errors.password && s.inputWrapError]}>
               <Ionicons name="lock-closed-outline" size={16} color={COLORS.textMuted} style={s.inputIcon} />
               <TextInput
-                style={[s.input, { flex: 1 }]} placeholder="Mínimo 6 caracteres"
+                style={[s.input, { flex: 1 }]} placeholder="M√≠nimo 6 caracteres"
                 placeholderTextColor={COLORS.textMuted} secureTextEntry={!showPass} value={password}
                 onChangeText={(t) => { setPassword(t); if (errors.password) setErrors({ ...errors, password: undefined }); }}
                 editable={!isLoading}
@@ -151,12 +151,12 @@ export default function SignUpScreen() {
           <TouchableOpacity style={[s.btn, isLoading && s.btnDisabled]} onPress={handleSignUp} disabled={isLoading} activeOpacity={0.85}>
             {isLoading
               ? <ActivityIndicator color="#fff" size="small" />
-              : <Text style={s.btnText}>Criar conta grátis</Text>}
+              : <Text style={s.btnText}>Criar conta gr√°tis</Text>}
           </TouchableOpacity>
         </View>
 
         <View style={s.footer}>
-          <Text style={s.footerText}>Já tem conta? </Text>
+          <Text style={s.footerText}>J√° tem conta? </Text>
           <TouchableOpacity onPress={() => router.replace("/(auth)/sign-in" as any)} disabled={isLoading}>
             <Text style={s.footerLink}>Entrar</Text>
           </TouchableOpacity>

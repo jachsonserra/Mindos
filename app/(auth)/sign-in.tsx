@@ -18,10 +18,10 @@ export default function SignInScreen() {
 
   function validate() {
     const e: typeof errors = {};
-    if (!email.trim()) e.email = "Email Ž obrigat—rio";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Email inv‡lido";
-    if (!password) e.password = "Senha Ž obrigat—ria";
-    else if (password.length < 6) e.password = "M’nimo 6 caracteres";
+    if (!email.trim()) e.email = "Email Ã© obrigatÃ³rio";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Email invÃ¡lido";
+    if (!password) e.password = "Senha Ã© obrigatÃ³ria";
+    else if (password.length < 6) e.password = "MÃ­nimo 6 caracteres";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -48,7 +48,7 @@ export default function SignInScreen() {
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={s.root}>
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
-        {/* Back to landing */}
+        {/* Voltar */}
         <TouchableOpacity style={s.backBtn} onPress={() => router.replace("/" as any)}>
           <Ionicons name="arrow-back" size={20} color={COLORS.textMuted} />
         </TouchableOpacity>
@@ -65,13 +65,13 @@ export default function SignInScreen() {
           <Text style={s.cardTitle}>Entrar</Text>
           <Text style={s.cardSub}>Bem-vindo de volta</Text>
 
-          {/* Google button */}
+          {/* Google */}
           <TouchableOpacity style={[s.googleBtn, isLoading && s.btnDisabled]} onPress={handleGoogle} disabled={isLoading} activeOpacity={0.85}>
             <Text style={s.googleIcon}>G</Text>
             <Text style={s.googleText}>Continuar com Google</Text>
           </TouchableOpacity>
 
-          {/* Divider */}
+          {/* Divisor */}
           <View style={s.divider}>
             <View style={s.dividerLine} />
             <Text style={s.dividerText}>ou</Text>
@@ -105,7 +105,7 @@ export default function SignInScreen() {
               <Ionicons name="lock-closed-outline" size={16} color={COLORS.textMuted} style={s.inputIcon} />
               <TextInput
                 style={[s.input, { flex: 1 }]}
-                placeholder="M’nimo 6 caracteres"
+                placeholder="MÃ­nimo 6 caracteres"
                 placeholderTextColor={COLORS.textMuted}
                 secureTextEntry={!showPass}
                 autoComplete="password"
@@ -130,7 +130,7 @@ export default function SignInScreen() {
         </View>
 
         <View style={s.footer}>
-          <Text style={s.footerText}>N‹o tem conta? </Text>
+          <Text style={s.footerText}>NÃ£o tem conta? </Text>
           <TouchableOpacity onPress={() => router.push("/(auth)/sign-up" as any)} disabled={isLoading}>
             <Text style={s.footerLink}>Criar conta</Text>
           </TouchableOpacity>
@@ -141,10 +141,10 @@ export default function SignInScreen() {
 }
 
 const s = StyleSheet.create({
-  root:   { flex: 1, backgroundColor: COLORS.background },
-  scroll: { flexGrow: 1, justifyContent: "center", paddingHorizontal: SPACING.xl, paddingVertical: SPACING.xxl },
+  root:    { flex: 1, backgroundColor: COLORS.background },
+  scroll:  { flexGrow: 1, justifyContent: "center", paddingHorizontal: SPACING.xl, paddingVertical: SPACING.xxl },
   backBtn: { position: "absolute", top: SPACING.xl, left: SPACING.xl, padding: SPACING.sm },
-  brand:  { alignItems: "center", marginBottom: SPACING.xxl + SPACING.lg, gap: SPACING.sm },
+  brand:   { alignItems: "center", marginBottom: SPACING.xxl + SPACING.lg, gap: SPACING.sm },
   brandIcon: {
     width: 52, height: 52, borderRadius: RADIUS.lg,
     backgroundColor: COLORS.primaryMuted, borderWidth: 1, borderColor: COLORS.primaryDark,
@@ -163,8 +163,6 @@ const s = StyleSheet.create({
   },
   cardTitle: { ...TYPOGRAPHY.h3, color: COLORS.text },
   cardSub:   { ...TYPOGRAPHY.body, color: COLORS.textSecondary, marginTop: -SPACING.sm, marginBottom: SPACING.sm },
-
-  // Google button
   googleBtn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,
     backgroundColor: COLORS.surfaceAlt, borderRadius: RADIUS.md,
@@ -172,14 +170,11 @@ const s = StyleSheet.create({
   },
   googleIcon: { fontSize: 18, fontWeight: "800", color: "#4285F4" },
   googleText: { ...TYPOGRAPHY.body, color: COLORS.text, fontWeight: "600" },
-
-  // Divider
-  divider: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
+  divider:     { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
   dividerLine: { flex: 1, height: 1, backgroundColor: COLORS.border },
   dividerText: { ...TYPOGRAPHY.caption, color: COLORS.textMuted },
-
-  field:         { gap: SPACING.xs },
-  label:         { ...TYPOGRAPHY.bodySmall, color: COLORS.textSecondary, fontWeight: "600" },
+  field:          { gap: SPACING.xs },
+  label:          { ...TYPOGRAPHY.bodySmall, color: COLORS.textSecondary, fontWeight: "600" },
   inputWrap: {
     flexDirection: "row", alignItems: "center",
     backgroundColor: COLORS.surfaceAlt, borderRadius: RADIUS.md,
@@ -188,7 +183,7 @@ const s = StyleSheet.create({
   },
   inputWrapError: { borderColor: COLORS.error },
   inputIcon:  { marginRight: SPACING.sm },
-  input: { flex: 1, ...TYPOGRAPHY.body, color: COLORS.text, outlineStyle: "none" as any },
+  input:      { flex: 1, ...TYPOGRAPHY.body, color: COLORS.text, outlineStyle: "none" as any },
   eyeBtn:     { padding: SPACING.xs },
   errorText:  { ...TYPOGRAPHY.caption, color: COLORS.error },
   forgotBtn:  { alignSelf: "flex-end" },
@@ -199,7 +194,7 @@ const s = StyleSheet.create({
     shadowColor: COLORS.primary, shadowOpacity: 0.35, shadowRadius: 14, shadowOffset: { width: 0, height: 4 },
   },
   btnDisabled: { opacity: 0.6 },
-  btnText: { ...TYPOGRAPHY.h4, color: "#fff", letterSpacing: 0.3 },
+  btnText:     { ...TYPOGRAPHY.h4, color: "#fff", letterSpacing: 0.3 },
   footer:      { flexDirection: "row", justifyContent: "center", alignItems: "center" },
   footerText:  { ...TYPOGRAPHY.body, color: COLORS.textSecondary },
   footerLink:  { ...TYPOGRAPHY.body, color: COLORS.primary, fontWeight: "700" },

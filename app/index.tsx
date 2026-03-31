@@ -15,12 +15,12 @@ import { useUserStore } from "../src/stores/useUserStore";
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../src/utils/constants";
 
 const FEATURES = [
-  { icon: "flame-outline",      color: "#FF6B35", title: "Hábitos & Rotinas",   desc: "Construa hábitos com gamificação e streaks diários" },
-  { icon: "trophy-outline",     color: "#FFD700", title: "XP & Missões",        desc: "Ganhe pontos por cada conquista e suba de nível" },
-  { icon: "flag-outline",       color: "#4ECDC4", title: "Metas SMARTER",       desc: "Defina e acompanhe objetivos com checkpoints reais" },
-  { icon: "hardware-chip-outline", color: "#A78BFA", title: "Coach IA",         desc: "Assistente mental que te conhece de verdade" },
-  { icon: "albums-outline",     color: "#34D399", title: "Second Mind",         desc: "Notas, ideias e pensamentos sempre organizados" },
-  { icon: "heart-outline",      color: "#F87171", title: "Gratidão Diária",     desc: "Diário de gratidão para manter o foco no positivo" },
+  { icon: "flame-outline",         color: "#FF6B35", title: "H√°bitos & Rotinas",  desc: "Construa h√°bitos com gamifica√ß√£o e streaks di√°rios" },
+  { icon: "trophy-outline",        color: "#FFD700", title: "XP & Miss√µes",       desc: "Ganhe pontos por cada conquista e suba de n√≠vel" },
+  { icon: "flag-outline",          color: "#4ECDC4", title: "Metas SMARTER",      desc: "Defina e acompanhe objetivos com checkpoints reais" },
+  { icon: "hardware-chip-outline", color: "#A78BFA", title: "Coach IA",           desc: "Assistente mental que te conhece de verdade" },
+  { icon: "albums-outline",        color: "#34D399", title: "Second Mind",        desc: "Notas, ideias e pensamentos sempre organizados" },
+  { icon: "heart-outline",         color: "#F87171", title: "Gratid√£o Di√°ria",    desc: "Di√°rio de gratid√£o para manter o foco no positivo" },
 ];
 
 export default function Index() {
@@ -28,11 +28,10 @@ export default function Index() {
   const { isLoading: authLoading, isOnboarded, authUserId } = useUserStore();
   const { session, isLoading: sessionLoading } = useAuthStore();
 
-  // Redirect authenticated users straight to tabs
   useEffect(() => {
     if (sessionLoading || authLoading) return;
-    if (!session?.user.id) return; // Not logged in — show landing
-    if (authUserId !== session.user.id) return; // Still loading user
+    if (!session?.user.id) return;
+    if (authUserId !== session.user.id) return;
     if (!isOnboarded) {
       router.replace("/(onboarding)/welcome" as any);
     } else {
@@ -40,27 +39,17 @@ export default function Index() {
     }
   }, [sessionLoading, authLoading, session?.user.id, authUserId, isOnboarded]);
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim  = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 700, useNativeDriver: true }),
+      Animated.timing(fadeAnim,  { toValue: 1, duration: 700, useNativeDriver: true }),
       Animated.timing(slideAnim, { toValue: 0, duration: 700, useNativeDriver: true }),
     ]).start();
   }, []);
 
-  // While checking auth, show minimal spinner
-  if (sessionLoading) {
-    return (
-      <View style={s.loading}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-      </View>
-    );
-  }
-
-  // If user is logged in, don't flash landing page
-  if (session?.user.id) {
+  if (sessionLoading || session?.user.id) {
     return (
       <View style={s.loading}>
         <ActivityIndicator size="large" color={COLORS.primary} />
@@ -69,48 +58,41 @@ export default function Index() {
   }
 
   return (
-    <ScrollView
-      style={s.root}
-      contentContainerStyle={s.scroll}
-      showsVerticalScrollIndicator={false}
-    >
+    <ScrollView style={s.root} contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+
       {/* Hero */}
-      <Animated.View
-        style={[s.hero, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
-      >
+      <Animated.View style={[s.hero, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
         <View style={s.logoWrap}>
           <View style={s.logoDot} />
         </View>
         <Text style={s.heroTitle}>MindOS</Text>
         <Text style={s.heroSub}>Sua mente. Organizada.</Text>
         <Text style={s.heroDesc}>
-          O sistema operacional da sua vida — hábitos, metas, XP e{" "}
-          inteligência artificial em um só lugar.
+          O sistema operacional da sua vida ‚Äî h√°bitos, metas, XP e intelig√™ncia artificial em um s√≥ lugar.
         </Text>
 
-        {/* CTAs */}
         <Pressable
           style={({ pressed }) => [s.btnPrimary, pressed && s.pressed]}
           onPress={() => router.push("/(auth)/sign-up" as any)}
         >
           <Ionicons name="rocket-outline" size={18} color="#fff" />
-          <Text style={s.btnPrimaryText}>Começar agora — é grátis</Text>
+          <Text style={s.btnPrimaryText}>Come√ßar agora ‚Äî √© gr√°tis</Text>
         </Pressable>
 
         <Pressable
           style={({ pressed }) => [s.btnSecondary, pressed && s.pressed]}
           onPress={() => router.push("/(auth)/sign-in" as any)}
         >
-          <Text style={s.btnSecondaryText}>Já tenho conta</Text>
+          <Text style={s.btnSecondaryText}>J√° tenho conta</Text>
         </Pressable>
       </Animated.View>
 
-      {/* Stats bar */}
+      {/* Stats */}
       <View style={s.statsRow}>
         {[
-          { value: "28", label: "módulos" },
-          { value: "∞", label: "hábitos" },
-          { value: "100%", label: "privado" },
+          { value: "28",   label: "m√≥dulos"  },
+          { value: "‚àû",    label: "h√°bitos"  },
+          { value: "100%", label: "privado"  },
         ].map((stat) => (
           <View key={stat.label} style={s.statItem}>
             <Text style={s.statValue}>{stat.value}</Text>
@@ -119,9 +101,9 @@ export default function Index() {
         ))}
       </View>
 
-      {/* Features grid */}
+      {/* Features */}
       <View style={s.section}>
-        <Text style={s.sectionTitle}>Tudo que você precisa</Text>
+        <Text style={s.sectionTitle}>Tudo que voc√™ precisa</Text>
         <View style={s.grid}>
           {FEATURES.map((f) => (
             <View key={f.title} style={s.card}>
@@ -143,20 +125,19 @@ export default function Index() {
           onPress={() => router.push("/(auth)/sign-up" as any)}
         >
           <Ionicons name="person-add-outline" size={18} color="#fff" />
-          <Text style={s.btnPrimaryText}>Criar conta grátis</Text>
+          <Text style={s.btnPrimaryText}>Criar conta gr√°tis</Text>
         </Pressable>
-        <Text style={s.bottomNote}>Sem cartão de crédito. Sem prazo.</Text>
+        <Text style={s.bottomNote}>Sem cart√£o de cr√©dito. Sem prazo.</Text>
       </View>
     </ScrollView>
   );
 }
 
 const s = StyleSheet.create({
-  root:  { flex: 1, backgroundColor: COLORS.background },
+  root:    { flex: 1, backgroundColor: COLORS.background },
   loading: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: COLORS.background },
-  scroll: { paddingBottom: 60 },
+  scroll:  { paddingBottom: 60 },
 
-  // Hero
   hero: {
     alignItems: "center",
     paddingHorizontal: SPACING.xl,
@@ -187,7 +168,6 @@ const s = StyleSheet.create({
     maxWidth: 320,
   },
 
-  // Buttons
   btnPrimary: {
     flexDirection: "row", alignItems: "center", gap: 8,
     backgroundColor: COLORS.primary, borderRadius: RADIUS.md,
@@ -196,7 +176,7 @@ const s = StyleSheet.create({
     shadowColor: COLORS.primary, shadowOpacity: 0.4,
     shadowRadius: 16, shadowOffset: { width: 0, height: 4 },
   },
-  btnLarge: { paddingVertical: 16 },
+  btnLarge:       { paddingVertical: 16 },
   btnPrimaryText: { ...TYPOGRAPHY.h4, color: "#fff", letterSpacing: 0.3 },
   btnSecondary: {
     borderRadius: RADIUS.md, paddingVertical: 12,
@@ -206,7 +186,6 @@ const s = StyleSheet.create({
   btnSecondaryText: { ...TYPOGRAPHY.body, color: COLORS.textSecondary, fontWeight: "600" },
   pressed: { opacity: 0.8 },
 
-  // Stats
   statsRow: {
     flexDirection: "row", justifyContent: "space-around",
     marginHorizontal: SPACING.xl, marginBottom: SPACING.xl,
@@ -218,11 +197,9 @@ const s = StyleSheet.create({
   statValue: { ...TYPOGRAPHY.h2, color: COLORS.primary },
   statLabel: { ...TYPOGRAPHY.caption, color: COLORS.textMuted },
 
-  // Section
-  section: { paddingHorizontal: SPACING.xl, marginBottom: SPACING.xxl },
+  section:      { paddingHorizontal: SPACING.xl, marginBottom: SPACING.xxl },
   sectionTitle: { ...TYPOGRAPHY.h3, color: COLORS.text, marginBottom: SPACING.lg },
 
-  // Grid
   grid: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.md },
   card: {
     flex: 1, minWidth: 140,
@@ -231,11 +208,10 @@ const s = StyleSheet.create({
     borderWidth: 1, borderColor: COLORS.border,
     gap: SPACING.sm,
   },
-  cardIcon: { width: 44, height: 44, borderRadius: RADIUS.md, alignItems: "center", justifyContent: "center" },
+  cardIcon:  { width: 44, height: 44, borderRadius: RADIUS.md, alignItems: "center", justifyContent: "center" },
   cardTitle: { ...TYPOGRAPHY.bodySmall, color: COLORS.text, fontWeight: "700" },
   cardDesc:  { ...TYPOGRAPHY.caption, color: COLORS.textMuted, lineHeight: 18 },
 
-  // Bottom CTA
   bottomCta: {
     alignItems: "center", gap: SPACING.md,
     paddingHorizontal: SPACING.xl,
@@ -243,5 +219,5 @@ const s = StyleSheet.create({
     borderTopWidth: 1, borderTopColor: COLORS.border,
   },
   bottomCtaTitle: { ...TYPOGRAPHY.h3, color: COLORS.text, textAlign: "center" },
-  bottomNote: { ...TYPOGRAPHY.caption, color: COLORS.textMuted },
+  bottomNote:     { ...TYPOGRAPHY.caption, color: COLORS.textMuted },
 });
