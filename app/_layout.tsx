@@ -4,6 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { initI18n } from "../src/i18n";
+import { useLanguageStore } from "../src/stores/useLanguageStore";
 import "react-native-reanimated";
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
 import { useAutoRefresh } from "../src/hooks/useAutoRefresh";
@@ -43,7 +44,11 @@ export default function RootLayout() {
   }, [error]);
 
   useEffect(() => {
-    initI18n().then(() => setI18nReady(true));
+    initI18n().then(() => {
+      // Sincroniza o store com o idioma detectado (salvo pelo usuário ou do dispositivo)
+      useLanguageStore.getState().syncWithI18n();
+      setI18nReady(true);
+    });
   }, []);
 
   useEffect(() => {

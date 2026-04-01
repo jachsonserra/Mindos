@@ -352,6 +352,26 @@ export default function Dashboard() {
   const greeting = getGreeting();
   const firstName = user?.name?.split(" ")[0] ?? "Você";
 
+  /**
+   * Converte um URI local (blob:// ou file://) para base64 data URI.
+   * Necessário no web: blob URLs são temporários e perdem-se ao recarregar a página.
+   * Base64 data URIs persistem normalmente no IndexedDB.
+   */
+  async function toDataUri(uri: string): Promise<string> {
+    try {
+      const res = await fetch(uri);
+      const blob = await res.blob();
+      return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch {
+      return uri; // fallback para o URI original
+    }
+  }
+
   async function handlePickDreamBoard() {
     if (!user?.id || uploadingDreamBoard) return;
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -371,7 +391,10 @@ export default function Dashboard() {
         });
         await updateUser({ dreamBoardImageUri: url });
       } catch {
-        await updateUser({ dreamBoardImageUri: result.assets[0].uri });
+        // Fallback: converte para base64 data URI para persistir no IndexedDB
+        // (blob:// URIs do web são temporários e perdem-se ao recarregar)
+        const dataUri = await toDataUri(result.assets[0].uri);
+        await updateUser({ dreamBoardImageUri: dataUri });
       } finally {
         setUploadingDreamBoard(false);
       }
@@ -397,7 +420,9 @@ export default function Dashboard() {
         });
         await updateUser({ profileImageUri: url });
       } catch {
-        await updateUser({ profileImageUri: result.assets[0].uri });
+        // Fallback: converte para base64 data URI para persistir no IndexedDB
+        const dataUri = await toDataUri(result.assets[0].uri);
+        await updateUser({ profileImageUri: dataUri });
       } finally {
         setUploadingProfile(false);
       }
